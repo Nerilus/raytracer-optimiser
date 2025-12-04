@@ -13,3 +13,11 @@ add_library(rayscene
   ${CMAKE_CURRENT_SOURCE_DIR}/Mesh.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/SceneLoader.cpp
 )
+
+# Si le threading est activé, propager la définition
+if(ENABLE_THREADING)
+  target_compile_definitions(rayscene PRIVATE ENABLE_THREADING)
+  # Trouver la bibliothèque de threading (pthread sur Linux)
+  find_package(Threads REQUIRED)
+  target_link_libraries(rayscene PRIVATE Threads::Threads)
+endif()

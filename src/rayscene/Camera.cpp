@@ -3,6 +3,11 @@
 #include "Camera.hpp"
 #include "../raymath/Ray.hpp"
 
+#ifdef ENABLE_THREADING
+#include <thread>
+#include <vector>
+#endif
+
 struct RenderSegment
 {
 public:
@@ -73,6 +78,58 @@ void Camera::render(Image &image, Scene &scene)
 
   scene.prepare();
 
+#ifdef ENABLE_THREADING
+  // Multithreading: Diviser l'image en sections et créer un thread par section
+  unsigned int numThreads = std::thread::hardware_concurrency();
+  if (numThreads == 0) {
+    numThreads = 4; // Fallback si hardware_concurrency() retourne 0
+  }
+  
+  // Calculer le nombre de lignes par thread
+  int rowsPerThread = image.height / numThreads;
+  if (rowsPerThread == 0) {
+    rowsPerThread = 1; // Au moins 1 ligne par thread
+  }
+  
+  std::vector<std::thread> threads;
+  std::vector<RenderSegment*> segments;
+  
+  // Créer les segments et les threads
+  for (unsigned int i = 0; i < numThreads; ++i) {
+    RenderSegment *seg = new RenderSegment();
+    seg->height = height;
+    seg->image = &image;
+    seg->scene = &scene;
+    seg->intervalX = intervalX;
+    seg->intervalY = intervalY;
+    seg->reflections = Reflections;
+    
+    // Calculer les limites de chaque segment
+    seg->rowMin = i * rowsPerThread;
+    if (i == numThreads - 1) {
+      // Le dernier thread prend toutes les lignes restantes
+      seg->rowMax = image.height;
+    } else {
+      seg->rowMax = (i + 1) * rowsPerThread;
+    }
+    
+    segments.push_back(seg);
+    
+    // Créer et démarrer le thread
+    threads.push_back(std::thread(renderSegment, seg));
+  }
+  
+  // Attendre que tous les threads terminent
+  for (auto& thread : threads) {
+    thread.join();
+  }
+  
+  // Libérer la mémoire des segments
+  for (auto* seg : segments) {
+    delete seg;
+  }
+#else
+  // Version sans threading (comportement original)
   RenderSegment *seg = new RenderSegment();
   seg->height = height;
   seg->image = &image;
@@ -83,6 +140,8 @@ void Camera::render(Image &image, Scene &scene)
   seg->rowMin = 0;
   seg->rowMax = image.height;
   renderSegment(seg);
+  delete seg;
+#endif
 }
 
 std::ostream &operator<<(std::ostream &_stream, Camera &cam)
