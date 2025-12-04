@@ -1,0 +1,1 @@
+/usr/bin/c++ -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/compare_images.dir/link.d CMakeFiles/compare_images.dir/compare_images.cpp.o -o compare_images  ../src/lodepng/liblodepng.a

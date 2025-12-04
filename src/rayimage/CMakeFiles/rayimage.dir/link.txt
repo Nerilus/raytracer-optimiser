@@ -1,0 +1,2 @@
+/usr/bin/ar qc librayimage.a CMakeFiles/rayimage.dir/Image.cpp.o
+/usr/bin/ranlib librayimage.a

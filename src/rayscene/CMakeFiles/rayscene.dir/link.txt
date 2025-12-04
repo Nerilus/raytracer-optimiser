@@ -1,0 +1,2 @@
+/usr/bin/ar qc librayscene.a CMakeFiles/rayscene.dir/Camera.cpp.o CMakeFiles/rayscene.dir/Scene.cpp.o CMakeFiles/rayscene.dir/SceneObject.cpp.o CMakeFiles/rayscene.dir/Intersection.cpp.o CMakeFiles/rayscene.dir/Sphere.cpp.o CMakeFiles/rayscene.dir/Triangle.cpp.o CMakeFiles/rayscene.dir/Plane.cpp.o CMakeFiles/rayscene.dir/Light.cpp.o CMakeFiles/rayscene.dir/Material.cpp.o CMakeFiles/rayscene.dir/PhongMaterial.cpp.o CMakeFiles/rayscene.dir/CheckerMaterial.cpp.o CMakeFiles/rayscene.dir/Mesh.cpp.o CMakeFiles/rayscene.dir/SceneLoader.cpp.o
+/usr/bin/ranlib librayscene.a

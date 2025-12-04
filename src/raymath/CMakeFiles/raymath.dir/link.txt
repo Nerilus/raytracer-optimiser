@@ -1,0 +1,2 @@
+/usr/bin/ar qc libraymath.a CMakeFiles/raymath.dir/Color.cpp.o CMakeFiles/raymath.dir/Vector3.cpp.o CMakeFiles/raymath.dir/Ray.cpp.o CMakeFiles/raymath.dir/AABB.cpp.o CMakeFiles/raymath.dir/Matrix.cpp.o CMakeFiles/raymath.dir/Transform.cpp.o
+/usr/bin/ranlib libraymath.a
