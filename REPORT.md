@@ -210,3 +210,39 @@ sys     0m0,031s
 
 pour le schema
 nerilusherby@fedora:~/raytracer-optimiser/build$ kcachegrind callgrind.out.5560
+
+
+Mesure "SANS Multithreading" (Baseline)
+
+    Désactivez le flag : Ouvrez CMakeLists.txt et commentez la ligne (ajoutez un #) :
+    CMake
+
+# add_compile_definitions(ENABLE_MULTITHREADING)
+
+Recompilez et Mesurez :
+Bash
+
+    cd build
+    cmake ..  # Recharge la config sans le flag
+    make      # Recompile (Camera.cpp va changer)
+    time ./raytracer ../scenes/monkey-on-plane.json
+
+    Notez le temps (ex: 637.658s ou similaire).
+
+B. Mesure "AVEC Multithreading" (Optimisé)
+
+    Activez le flag : Ouvrez CMakeLists.txt et décommentez la ligne (enlevez le #) :
+    CMake
+
+add_compile_definitions(ENABLE_MULTITHREADING)
+
+Recompilez et Mesurez :
+Bash
+
+cmake ..  # Recharge la config avec le flag
+make      # Recompile
+time ./raytracer ../scenes/monkey-on-plane.json
+
+Validation des Tests
+
+./tests/compare_images image.png ../readme/monkey-on-plane.png

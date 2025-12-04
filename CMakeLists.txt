@@ -4,6 +4,10 @@ project(raytracer VERSION 0.1.0 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+find_package(Threads REQUIRED)
+
+add_compile_definitions(ENABLE_MULTITHREADING)
+
 add_executable(raytracer main.cpp)
 
 target_include_directories(raytracer PUBLIC
@@ -24,6 +28,7 @@ target_link_libraries(raytracer
                       raymath
                       rayimage
                       lodepng
+                      Threads::Threads
                       )
 
 enable_testing()
