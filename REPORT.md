@@ -183,3 +183,13 @@ Le système s'occupe automatiquement de :
 - Le fichier de métriques est créé dans le répertoire de build (`build/metrics.csv`)
 - Pour un test sans comparaison d'image, passer une chaîne vide `""` comme troisième paramètre
 
+cd build
+
+# Tests rapides
+ctest -R "EdgeCase_Empty|EndToEnd_TwoSpheres|EndToEnd_TwoTriangles"
+
+# Tous les tests sauf Monkey
+ctest -E EndToEnd_Monkey --output-on-failure
+
+# Un test spécifique
+ctest -R EndToEnd_TwoSpheres --output-on-failure

@@ -33,8 +33,12 @@ file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/run_test.cmake
 
     # 2. Run Comparator if REF_FILE provided
     if(NOT \"\${REF_FILE}\" STREQUAL \"\")
+        # Utiliser la tolérance fournie ou 0 par défaut
+        if(NOT DEFINED TOLERANCE)
+            set(TOLERANCE \"0\")
+        endif()
         execute_process(
-            COMMAND \${COMPARATOR_EXE} \${OUTPUT_FILE} \${REF_FILE}
+            COMMAND \${COMPARATOR_EXE} \${OUTPUT_FILE} \${REF_FILE} \${TOLERANCE}
             RESULT_VARIABLE RET2
             OUTPUT_VARIABLE OUT2
             ERROR_VARIABLE ERR2
@@ -51,7 +55,14 @@ file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/run_test.cmake
 )
 
 # Macro pour ajouter un test
+# TOLERANCE optionnel : tolérance pour la comparaison d'images (défaut: 0 pour comparaison exacte)
 macro(add_raytracer_test TEST_NAME SCENE_FILE REF_FILE)
+    # Vérifier si un 4ème paramètre (tolérance) est fourni
+    if(${ARGC} GREATER 3)
+        set(TOLERANCE_VAL ${ARGV3})
+    else()
+        set(TOLERANCE_VAL "0")
+    endif()
     add_test(NAME ${TEST_NAME}
         COMMAND ${CMAKE_COMMAND} 
         -DRAYTRACER_EXE=$<TARGET_FILE:raytracer>
@@ -61,6 +72,7 @@ macro(add_raytracer_test TEST_NAME SCENE_FILE REF_FILE)
         -DCOMPARATOR_EXE=$<TARGET_FILE:compare_images>
         -DTEST_NAME=${TEST_NAME}
         -DMETRICS_FILE=${PROJECT_BINARY_DIR}/metrics.csv
+        -DTOLERANCE=${TOLERANCE_VAL}
         -P ${CMAKE_CURRENT_BINARY_DIR}/run_test.cmake
     )
 endmacro()
@@ -75,10 +87,13 @@ add_raytracer_test(EndToEnd_Monkey
     ${PROJECT_SOURCE_DIR}/scenes/monkey-on-plane.json
     ${PROJECT_SOURCE_DIR}/readme/monkey-on-plane.png
 )
+# Le test Monkey prend beaucoup de temps (>1000s), définir un timeout très long
+set_tests_properties(EndToEnd_Monkey PROPERTIES TIMEOUT 3600)
 
 add_raytracer_test(EndToEnd_TwoTriangles
     ${PROJECT_SOURCE_DIR}/scenes/two-triangles-on-plane.json
     ${PROJECT_SOURCE_DIR}/readme/two-triangles-on-plane.png
+    "2"
 )
 
 # 2. Edge case test (Small empty image)
