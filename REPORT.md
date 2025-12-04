@@ -193,3 +193,20 @@ ctest -E EndToEnd_Monkey --output-on-failure
 
 # Un test spécifique
 ctest -R EndToEnd_TwoSpheres --output-on-failure
+
+
+*********************************
+*** Kevin's Awesome Raytracer ***
+*********************************
+
+Rendering 1920x1080 pixels...
+Done.
+Total time: 4.548 seconds.
+Writing file: image.png
+
+real    0m5,437s
+user    0m5,377s
+sys     0m0,031s
+
+pour le schema
+nerilusherby@fedora:~/raytracer-optimiser/build$ kcachegrind callgrind.out.5560

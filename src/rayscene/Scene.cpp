@@ -1,88 +1,67 @@
 #include <iostream>
 #include "Scene.hpp"
 #include "Intersection.hpp"
+#include <cmath> // Ajouté pour sqrt si nécessaire
 
-Scene::Scene()
-{
-}
+Scene::Scene() {}
 
 Scene::~Scene()
 {
-  for (int i = 0; i < objects.size(); ++i)
-  {
-    delete objects[i];
-  }
-
-  for (int i = 0; i < lights.size(); ++i)
-  {
-    delete lights[i];
-  }
+  for (int i = 0; i < objects.size(); ++i) delete objects[i];
+  for (int i = 0; i < lights.size(); ++i) delete lights[i];
 }
 
-void Scene::add(SceneObject *object)
-{
-  objects.push_back(object);
-}
-
-void Scene::addLight(Light *light)
-{
-  lights.push_back(light);
-}
+void Scene::add(SceneObject *object) { objects.push_back(object); }
+void Scene::addLight(Light *light) { lights.push_back(light); }
 
 void Scene::prepare()
 {
-  for (int i = 0; i < objects.size(); ++i)
-  {
-    objects[i]->applyTransform();
-  }
+  for (int i = 0; i < objects.size(); ++i) objects[i]->applyTransform();
 }
 
-std::vector<Light *> Scene::getLights()
-{
-  return lights;
-}
+std::vector<Light *> Scene::getLights() { return lights; }
 
 bool Scene::closestIntersection(Ray &r, Intersection &closest, CullingType culling)
 {
   Intersection intersection;
-
-  double closestDistance = -1;
+  double closestDistSq = -1; // On stocke la distance au carré
   Intersection closestInter;
+
   for (int i = 0; i < objects.size(); ++i)
   {
     if (objects[i]->intersects(r, intersection, culling))
     {
+      // OPTIMISATION : lengthSquared() au lieu de length()
+      double distSq = (intersection.Position - r.GetPosition()).lengthSquared();
 
-      intersection.Distance = (intersection.Position - r.GetPosition()).length();
-      if (closestDistance < 0 || intersection.Distance < closestDistance)
+      if (closestDistSq < 0 || distSq < closestDistSq)
       {
-        closestDistance = intersection.Distance;
+        closestDistSq = distSq;
         closestInter = intersection;
+        // On calcule la vraie distance seulement si on garde cet objet
+        closestInter.Distance = std::sqrt(distSq); 
       }
     }
   }
   closest = closestInter;
-  return (closestDistance > -1);
+  return (closestDistSq > -1);
 }
 
 Color Scene::raycast(Ray &r, Ray &camera, int castCount, int maxCastCount)
 {
-
   Color pixel;
-
   Intersection intersection;
 
   if (closestIntersection(r, intersection, CULLING_FRONT))
   {
-    // Add the view-ray for convenience (the direction is normalised in the constructor)
     intersection.View = (camera.GetPosition() - intersection.Position).normalize();
 
     if (intersection.Mat != NULL)
     {
       pixel = pixel + (intersection.Mat)->render(r, camera, &intersection, this);
 
-      // Reflect
-      if (castCount < maxCastCount & intersection.Mat->cReflection > 0)
+      // OPTIMISATION #3 : Remplacement de '&' par '&&' (Logique vs Binaire)
+      if (castCount < maxCastCount && intersection.Mat->cReflection > 0)
       {
         Vector3 reflectDir = r.GetDirection().reflect(intersection.Normal);
         Vector3 origin = intersection.Position + (reflectDir * COMPARE_ERROR_CONSTANT);
@@ -92,6 +71,5 @@ Color Scene::raycast(Ray &r, Ray &camera, int castCount, int maxCastCount)
       }
     }
   }
-
   return pixel;
 }
