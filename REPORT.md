@@ -246,3 +246,9 @@ time ./raytracer ../scenes/monkey-on-plane.json
 Validation des Tests
 
 ./tests/compare_images image.png ../readme/monkey-on-plane.png
+
+
+
+Configuration,Temps de rendu,Gain
+Sans AABB (Baseline),637.658 s,-
+Avec AABB (Optimisé),207.852 s,x3.06

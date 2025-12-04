@@ -6,7 +6,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 find_package(Threads REQUIRED)
 
-add_compile_definitions(ENABLE_MULTITHREADING)
 
 add_executable(raytracer main.cpp)
 
