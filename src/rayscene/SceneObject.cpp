@@ -18,3 +18,9 @@ bool SceneObject::intersects(Ray &r, Intersection &intersection, CullingType cul
 void SceneObject::applyTransform()
 {
 }
+
+AABB SceneObject::getAABB()
+{
+  // Implémentation par défaut : boîte vide
+  return AABB(Vector3(0, 0, 0), Vector3(0, 0, 0));
+}

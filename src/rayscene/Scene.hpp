@@ -6,11 +6,19 @@
 #include "Light.hpp"
 #include "SceneObject.hpp"
 
+#ifdef ENABLE_BSP
+#include "BSPTree.hpp"
+#endif
+
 class Scene
 {
 private:
   std::vector<SceneObject *> objects;
   std::vector<Light *> lights;
+
+#ifdef ENABLE_BSP
+  BSPTree* bspTree;
+#endif
 
 public:
   Scene();

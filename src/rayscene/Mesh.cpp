@@ -139,3 +139,8 @@ bool Mesh::intersects(Ray &r, Intersection &intersection, CullingType culling)
     intersection = closestInter;
     return true;
 }
+
+AABB Mesh::getAABB()
+{
+  return box;
+}

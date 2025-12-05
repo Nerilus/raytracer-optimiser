@@ -12,4 +12,5 @@ add_library(rayscene
   ${CMAKE_CURRENT_SOURCE_DIR}/CheckerMaterial.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/Mesh.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/SceneLoader.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/BSPTree.cpp
 )

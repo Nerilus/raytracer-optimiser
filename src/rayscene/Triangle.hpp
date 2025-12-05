@@ -25,4 +25,5 @@ public:
 
   virtual void applyTransform() override;
   virtual bool intersects(Ray &r, Intersection &intersection, CullingType culling) override;
+  virtual AABB getAABB() override;
 };
