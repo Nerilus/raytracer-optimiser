@@ -12,14 +12,12 @@ public:
   double y = 0;
   double z = 0;
 
-  // --- CONSTRUCTEURS (Code intégré ici) ---
   Vector3() : x(0), y(0), z(0) {}
   
   Vector3(double iX, double iY, double iZ) : x(iX), y(iY), z(iZ) {}
   
   ~Vector3() {}
 
-  // --- OPÉRATEURS (Code intégré ici) ---
   
   inline Vector3 operator+(Vector3 const &vec) const {
     return Vector3(x + vec.x, y + vec.y, z + vec.z);

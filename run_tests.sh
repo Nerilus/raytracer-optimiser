@@ -9,31 +9,31 @@ cd "$(dirname "$0")/build" || exit 1
 
 case "${1:-rapide}" in
     rapide|fast)
-        echo "🚀 Exécution des tests rapides..."
+        echo " Exécution des tests rapides..."
         echo ""
         ctest -R "EdgeCase_Empty|EndToEnd_TwoSpheres|EndToEnd_TwoTriangles" --output-on-failure
         ;;
     
     complet|all)
-        echo "🧪 Exécution de tous les tests (sans Monkey)..."
+        echo " Exécution de tous les tests (sans Monkey)..."
         echo ""
         ctest -E EndToEnd_Monkey --output-on-failure
         ;;
     
     monkey)
-        echo "🐒 Exécution du test Monkey (peut prendre 16+ minutes)..."
+        echo " Exécution du test Monkey (peut prendre 16+ minutes)..."
         echo ""
         ctest -R EndToEnd_Monkey --output-on-failure
         ;;
     
     liste|list)
-        echo "📋 Liste des tests disponibles:"
+        echo " Liste des tests disponibles:"
         echo ""
         ctest -N
         ;;
     
     metriques|metrics)
-        echo "📊 Métriques de performance:"
+        echo " Métriques de performance:"
         echo ""
         if [ -f metrics.csv ]; then
             cat metrics.csv | column -t -s, 2>/dev/null || cat metrics.csv

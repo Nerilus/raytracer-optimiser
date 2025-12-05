@@ -4,8 +4,18 @@ project(raytracer VERSION 0.1.0 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+option(ENABLE_AABB "Enable AABB bounding box optimization" ON)
+
+if(ENABLE_AABB)
+  add_compile_definitions(ENABLE_AABB)
+  message(STATUS "AABB optimization: ENABLED")
+else()
+  message(STATUS "AABB optimization: DISABLED")
+endif()
+
 find_package(Threads REQUIRED)
 
+add_compile_definitions(ENABLE_MULTITHREADING)
 
 add_executable(raytracer main.cpp)
 

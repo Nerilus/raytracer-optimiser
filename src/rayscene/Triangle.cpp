@@ -17,6 +17,21 @@ void Triangle::applyTransform()
   tA = this->transform.apply(A);
   tB = this->transform.apply(B);
   tC = this->transform.apply(C);
+  computeBoundingBox();
+}
+
+void Triangle::computeBoundingBox()
+{
+  Vector3 minPt(
+      std::min({tA.x, tB.x, tC.x}),
+      std::min({tA.y, tB.y, tC.y}),
+      std::min({tA.z, tB.z, tC.z}));
+  Vector3 maxPt(
+      std::max({tA.x, tB.x, tC.x}),
+      std::max({tA.y, tB.y, tC.y}),
+      std::max({tA.z, tB.z, tC.z}));
+  boundingBox = AABB(minPt, maxPt);
+  hasBoundingBox = true;
 }
 
 bool Triangle::intersects(Ray &r, Intersection &intersection, CullingType culling)

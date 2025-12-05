@@ -1,28 +1,99 @@
-#pragma once
-#include "SceneObject.hpp"
+#include <iostream>
+#include <cmath>
+#include <algorithm>
+#include "Triangle.hpp"
 #include "../raymath/Vector3.hpp"
-#include "../raymath/Color.hpp"
-#include "../raymath/Ray.hpp"
-#include "../raymath/Transform.hpp"
 
-class Triangle : public SceneObject
+Triangle::Triangle(Vector3 a, Vector3 b, Vector3 c) : SceneObject(), A(a), B(b), C(c)
 {
-private:
-  Vector3 A;
-  Vector3 B;
-  Vector3 C;
-  
-public:
-  Vector3 tA;
-  Vector3 tB;
-  Vector3 tC;
+}
 
+Triangle::~Triangle()
+{
+}
 
-  Triangle(Vector3 a, Vector3 b, Vector3 c);
-  ~Triangle();
+void Triangle::applyTransform()
+{
+  tA = this->transform.apply(A);
+  tB = this->transform.apply(B);
+  tC = this->transform.apply(C);
+  computeBoundingBox();
+}
 
-  int ID;
+void Triangle::computeBoundingBox()
+{
+  Vector3 minPt(
+      std::min({tA.x, tB.x, tC.x}),
+      std::min({tA.y, tB.y, tC.y}),
+      std::min({tA.z, tB.z, tC.z}));
+  Vector3 maxPt(
+      std::max({tA.x, tB.x, tC.x}),
+      std::max({tA.y, tB.y, tC.y}),
+      std::max({tA.z, tB.z, tC.z}));
+  boundingBox = AABB(minPt, maxPt);
+  hasBoundingBox = true;
+}
 
-  virtual void applyTransform() override;
-  virtual bool intersects(Ray &r, Intersection &intersection, CullingType culling) override;
-};
+bool Triangle::intersects(Ray &r, Intersection &intersection, CullingType culling)
+{
+  Vector3 BA = tB - tA;
+  Vector3 CA = tC - tA;
+  Vector3 normal = BA.cross(CA).normalize();
+
+  // Ray plane intersection
+  float denom = r.GetDirection().dot(normal);
+
+  //
+  // If denom == 0 - it is parallel to the plane
+  // If denom > 0, it means plane is behind the ray
+  if (culling == CULLING_FRONT && denom > -0.000001)
+  {
+    return false;
+  }
+  if (culling == CULLING_BACK && denom < 0.000001)
+  {
+    return false;
+  }
+
+  float numer = (tA - r.GetPosition()).dot(normal);
+  float t = numer / denom;
+
+  // Behind the ray
+  if (t <= 0)
+  {
+    return false;
+  }
+
+  // Point on plane
+  Vector3 Q = r.GetPosition() + (r.GetDirection() * t);
+
+  // Point contained in triangle
+  Vector3 QA = Q - tA;
+  Vector3 BAxQA = BA.cross(QA);
+  if (BAxQA.dot(normal) < 0)
+  {
+    return false;
+  }
+
+  Vector3 CB = tC - tB;
+  Vector3 QB = Q - tB;
+  Vector3 CBxQB = CB.cross(QB);
+  if (CBxQB.dot(normal) < 0)
+  {
+    return false;
+  }
+
+  Vector3 AC = tA - tC;
+  Vector3 QC = Q - tC;
+  Vector3 ACxQC = AC.cross(QC);
+  if (ACxQC.dot(normal) < 0)
+  {
+    return false;
+  }
+
+  intersection.Position = Q;
+  intersection.Mat = this->material;
+  intersection.Normal = normal;
+
+  return true;
+}

@@ -6,13 +6,12 @@
 #include "../raymath/Color.hpp"
 #include "../raymath/Ray.hpp"
 #include "./Triangle.hpp"
-#include "../raymath/AABB.hpp" 
 
 class Mesh : public SceneObject
 {
 private:
   std::vector<Triangle *> triangles;
-  AABB box;
+
 public:
   Mesh();
   ~Mesh();
@@ -20,5 +19,6 @@ public:
   void loadFromObj(std::string path);
 
   virtual void applyTransform() override;
+  virtual void computeBoundingBox() override;
   virtual bool intersects(Ray &r, Intersection &intersection, CullingType culling) override;
 };

@@ -2,7 +2,6 @@
 #include "Mesh.hpp"
 #include "../raymath/Vector3.hpp"
 #include "../objloader/OBJ_Loader.h"
-#include <limits>
 
 Mesh::Mesh() : SceneObject()
 {
@@ -60,59 +59,44 @@ void Mesh::loadFromObj(std::string path)
 
 void Mesh::applyTransform()
 {
-    // Initialisation des limites
-    double minDouble = std::numeric_limits<double>::lowest();
-    double maxDouble = std::numeric_limits<double>::max();
-    
-    Vector3 minPoint(maxDouble, maxDouble, maxDouble);
-    Vector3 maxPoint(minDouble, minDouble, minDouble);
-
     for (int i = 0; i < triangles.size(); ++i)
     {
         triangles[i]->material = this->material;
         triangles[i]->transform = transform;
         triangles[i]->applyTransform();
-
-        // --- CORRECTION ICI : Utilisez tA, tB, tC ---
-        Vector3 v1 = triangles[i]->tA;
-        Vector3 v2 = triangles[i]->tB;
-        Vector3 v3 = triangles[i]->tC;
-
-        // Le reste de la logique reste identique...
-        if (v1.x < minPoint.x) minPoint.x = v1.x;
-        if (v1.y < minPoint.y) minPoint.y = v1.y;
-        if (v1.z < minPoint.z) minPoint.z = v1.z;
-        
-        // ... (Faites pareil pour v2 et v3 et pour le maxPoint) ...
-        // Je vous remets le bloc complet pour éviter les erreurs :
-        
-        if (v2.x < minPoint.x) minPoint.x = v2.x;
-        if (v2.y < minPoint.y) minPoint.y = v2.y;
-        if (v2.z < minPoint.z) minPoint.z = v2.z;
-
-        if (v3.x < minPoint.x) minPoint.x = v3.x;
-        if (v3.y < minPoint.y) minPoint.y = v3.y;
-        if (v3.z < minPoint.z) minPoint.z = v3.z;
-
-        // Max
-        if (v1.x > maxPoint.x) maxPoint.x = v1.x;
-        if (v1.y > maxPoint.y) maxPoint.y = v1.y;
-        if (v1.z > maxPoint.z) maxPoint.z = v1.z;
-
-        if (v2.x > maxPoint.x) maxPoint.x = v2.x;
-        if (v2.y > maxPoint.y) maxPoint.y = v2.y;
-        if (v2.z > maxPoint.z) maxPoint.z = v2.z;
-
-        if (v3.x > maxPoint.x) maxPoint.x = v3.x;
-        if (v3.y > maxPoint.y) maxPoint.y = v3.y;
-        if (v3.z > maxPoint.z) maxPoint.z = v3.z;
     }
-    
-    this->box = AABB(minPoint, maxPoint);
+    computeBoundingBox();
 }
+
+void Mesh::computeBoundingBox()
+{
+    if (triangles.empty())
+    {
+        hasBoundingBox = false;
+        return;
+    }
+
+    // Start with the first triangle's bounding box
+    boundingBox = triangles[0]->getBoundingBox();
+
+    // Subsume all other triangles' bounding boxes
+    for (size_t i = 1; i < triangles.size(); ++i)
+    {
+        boundingBox.subsume(triangles[i]->getBoundingBox());
+    }
+    hasBoundingBox = true;
+}
+
 bool Mesh::intersects(Ray &r, Intersection &intersection, CullingType culling)
 {
-    if (!box.intersects(r)) return false;
+#ifdef ENABLE_AABB
+    // Early exit if ray doesn't intersect mesh bounding box
+    if (hasBoundingBox && !boundingBox.intersects(r))
+    {
+        return false;
+    }
+#endif
+
     Intersection tInter;
 
     double closestDistance = -1;
@@ -122,7 +106,7 @@ bool Mesh::intersects(Ray &r, Intersection &intersection, CullingType culling)
         if (triangles[i]->intersects(r, tInter, culling))
         {
 
-            tInter.Distance = (tInter.Position - r.GetPosition()).length();
+            tInter.Distance = (tInter.Position - r.GetPosition()).lengthSquared();
             if (closestDistance < 0 || tInter.Distance < closestDistance)
             {
                 closestDistance = tInter.Distance;

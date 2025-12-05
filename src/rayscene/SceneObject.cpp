@@ -18,3 +18,9 @@ bool SceneObject::intersects(Ray &r, Intersection &intersection, CullingType cul
 void SceneObject::applyTransform()
 {
 }
+
+void SceneObject::computeBoundingBox()
+{
+  // Default: no bounding box
+  hasBoundingBox = false;
+}
