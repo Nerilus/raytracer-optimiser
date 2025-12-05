@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cmath>
+#include <limits>
 #include "Plane.hpp"
 #include "../raymath/Vector3.hpp"
 
@@ -31,4 +32,11 @@ bool Plane::intersects(Ray &r, Intersection &intersection, CullingType culling)
   intersection.Mat = this->material;
 
   return true;
+}
+
+AABB Plane::getAABB()
+{
+  // Un plan est infini, on retourne une boîte très grande
+  double inf = std::numeric_limits<double>::max() / 2.0;
+  return AABB(Vector3(-inf, -inf, -inf), Vector3(inf, inf, inf));
 }

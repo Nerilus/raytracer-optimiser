@@ -3,12 +3,21 @@
 #include "Intersection.hpp"
 #include <cmath> // Ajouté pour sqrt si nécessaire
 
-Scene::Scene() {}
+Scene::Scene() 
+{
+#ifdef ENABLE_BSP
+  bspTree = nullptr;
+#endif
+}
 
 Scene::~Scene()
 {
   for (int i = 0; i < objects.size(); ++i) delete objects[i];
   for (int i = 0; i < lights.size(); ++i) delete lights[i];
+  
+#ifdef ENABLE_BSP
+  if (bspTree) delete bspTree;
+#endif
 }
 
 void Scene::add(SceneObject *object) { objects.push_back(object); }
@@ -17,12 +26,28 @@ void Scene::addLight(Light *light) { lights.push_back(light); }
 void Scene::prepare()
 {
   for (int i = 0; i < objects.size(); ++i) objects[i]->applyTransform();
+
+#ifdef ENABLE_BSP
+  std::cout << "Building BSP-Tree with " << objects.size() << " objects..." << std::endl;
+  bspTree = new BSPTree(20, 5); // maxDepth=20, maxObjectsPerLeaf=5
+  bspTree->build(objects);
+  std::cout << "BSP-Tree built successfully." << std::endl;
+#endif
 }
 
 std::vector<Light *> Scene::getLights() { return lights; }
 
 bool Scene::closestIntersection(Ray &r, Intersection &closest, CullingType culling)
 {
+#ifdef ENABLE_BSP
+  // Utiliser le BSP-Tree pour accélérer la recherche
+  if (bspTree)
+  {
+    return bspTree->findClosestIntersection(r, closest, culling);
+  }
+#endif
+
+  // Fallback : méthode traditionnelle (parcourir tous les objets)
   Intersection intersection;
   double closestDistSq = -1; // On stocke la distance au carré
   Intersection closestInter;

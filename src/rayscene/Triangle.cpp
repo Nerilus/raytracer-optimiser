@@ -82,3 +82,21 @@ bool Triangle::intersects(Ray &r, Intersection &intersection, CullingType cullin
 
   return true;
 }
+
+AABB Triangle::getAABB()
+{
+  // Calculer les min/max de chaque axe
+  Vector3 minPoint(
+    std::min({tA.x, tB.x, tC.x}),
+    std::min({tA.y, tB.y, tC.y}),
+    std::min({tA.z, tB.z, tC.z})
+  );
+  
+  Vector3 maxPoint(
+    std::max({tA.x, tB.x, tC.x}),
+    std::max({tA.y, tB.y, tC.y}),
+    std::max({tA.z, tB.z, tC.z})
+  );
+  
+  return AABB(minPoint, maxPoint);
+}

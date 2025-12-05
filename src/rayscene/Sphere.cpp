@@ -52,3 +52,10 @@ bool Sphere::intersects(Ray &r, Intersection &intersection, CullingType culling)
 
   return true;
 }
+
+AABB Sphere::getAABB()
+{
+  // La boîte englobante d'une sphère est un cube centré sur la sphère
+  Vector3 offset(radius, radius, radius);
+  return AABB(center - offset, center + offset);
+}

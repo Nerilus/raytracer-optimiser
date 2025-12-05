@@ -6,6 +6,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 find_package(Threads REQUIRED)
 
+# ===========================================
+# FLAGS D'OPTIMISATION (décommenter au besoin)
+# ===========================================
+
+# Activer le multithreading pour le rendu parallèle
+add_compile_definitions(ENABLE_MULTITHREADING)
+
+# Activer le BSP-Tree pour accélérer les intersections rayon-scène
+# add_compile_definitions(ENABLE_BSP)
+
+# ===========================================
 
 add_executable(raytracer main.cpp)
 

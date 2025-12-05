@@ -3,6 +3,7 @@
 #include "Intersection.hpp"
 #include "Material.hpp"
 #include "../raymath/Transform.hpp"
+#include "../raymath/AABB.hpp"
 
 enum CullingType
 {
@@ -24,4 +25,5 @@ public:
 
   virtual void applyTransform();
   virtual bool intersects(Ray &r, Intersection &intersection, CullingType culling);
+  virtual AABB getAABB();
 };
